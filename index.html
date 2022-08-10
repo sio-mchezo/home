@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="utf-8"/>
+
+	<title>sio mchezo</title>
+<style type="text/css">
+@font-face {
+  font-family: 'oratorstd';
+  src: url('font/oratorstd-webfont.woff2') format('woff2'),
+  url('font/oratorstd-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+* {margin: 0; padding: 0;}
+html {
+	background-color: #222;
+	scroll-behavior: smooth;
+	user-select:none;
+}
+body {
+	background-color: #222;
+	font-family: monospace;
+	color: #eee;
+}
+a {text-decoration: none; color: #FF1493;}
+
+header a {
+	transition: all 0.3s ease-in-out;
+	color: #fff;
+	margin: 0 0 0 8px;
+}
+
+header ul {position: absolute; top: 20px; right: 40px;}
+header ul li {display: inline-block;}
+
+header a:hover {color: #FFF;}
+
+header h1 a {
+	font-family: 'oratorstd', monospace;
+	font-size: 30px;
+	color: #FF1493;
+	display: inline-block;
+	height: 60px;
+	line-height: 65px;
+	text-indent: 12px;
+}
+
+header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	line-height: 40px;
+	height: 50px;
+	width: 100vw;
+}
+article {
+	font-family: monospace;
+	display: block;
+	height: 100vh;
+	/*border-bottom:#FF1493 2px solid;*/
+	text-align: center;
+	width: 100vw;
+	/* --- FLEX --- */
+	display: flex;
+	
+	justify-content: center;
+	align-items: center;
+}
+
+.box {
+  /*width: 300px;*/
+  /*height: 300px;*/
+  color: #fff;
+  text-align: center;
+  display: inherit;
+  justify-content: inherit;
+  align-items: inherit;
+  transition: all 0.5s ease;
+  /*background-color: rgba(0,0,0,0.2);*/
+}
+
+article ul, article h2, article p {
+	  display: block;
+}
+header, article {
+	margin: 0;
+	padding:0;
+}
+
+/*#home {border-bottom:#FF1493 2px solid;}
+#about {border-bottom:#e41183 2px solid;}
+#services {border-bottom:#c90d73 2px solid;}
+#portfolio {border-bottom:#a7085e 2px solid;}*/
+
+article p {display: none;}
+h1, h2, h3, b {font-weight: lighter;}
+header h1 {font-size: 1em;}
+h2, p {text-indent: 15px;}
+</style>
+</head>
+<body>
+	<header>
+		<h1><a href="#">sio mchezo</a></h1>
+		<ul>
+		<li><a href="#home">home</a></li>
+		<li><a href="#about">about</a></li>
+		<li><a href="#services">services</a></li>
+		<li><a href="#portfolio">portfolio</a></li>
+		<li><a href="#contact">contact</a></li>
+		</ul>
+	</header>
+	
+	<article id="home">
+		<div class="box">
+			<h2>home</h2>
+			<p>hi</p>
+		</div>
+	</article>
+	
+	<article id="about">
+		<div class="box">
+			<h2>about</h2>
+			<p>hi</p>
+		</div>
+
+<!-- 		<ul>
+			<li>one</li>
+			<li>two</li>
+			<li>three</li>
+		</ul> -->
+
+	</article>
+	
+	<article id="services">
+		<div class="box">
+			<h2>services</h2>
+			<p>hi</p>	
+		</div>
+	</article>
+	
+	<article id="portfolio">
+		<div class="box">
+			<h2>portfolio</h2>
+			<p>hi</p>	
+		</div>
+	</article>
+	
+	<article id="contact">
+		<div class="box">
+			<h2>contact</h2>
+			<p>hi</p>	
+		</div>
+	</article>
+
+</body>
+</html>
