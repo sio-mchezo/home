@@ -1,0 +1,161 @@
+ <!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <title>sio mchezo</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+    @font-face {
+        font-family: 'oratorstd';
+        src: url('font/oratorstd-webfont.woff2') format('woff2'),
+        url('font/oratorstd-webfont.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+    body {
+        font-family: Monospace;
+        margin: 0;
+        padding: 0;
+        color: #fff;
+        background: #111;
+        font-family: 'oratorstd';
+    }
+    button{
+        background: transparent;
+        border: none;
+        outline: none;
+        font-family: 'oratorstd';
+        color: red;        
+    }
+    #header {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+    h2 {
+        display: block;
+        text-align: center;
+        font-weight: lighter;
+        font-size: 32px;
+    }
+    p {
+        text-align: center; 
+        display: block;
+    }
+    a {
+        text-decoration: none; 
+        color: red; padding: 4px;
+    }
+
+    #logobtn {
+        display: block;
+        width: 620px;
+        height: 130px;
+        margin: 0px auto;
+        position: relative;
+        cursor: pointer;
+        padding: 0;
+        opacity: 0.2;
+    }
+
+
+    .anim #logopath {
+        stroke-dasharray: 0 100;
+        animation: progress 2s ease-in reverse;
+        animation-iteration-count: 1;
+    }
+
+    @keyframes progress {
+        from {
+            stroke-dasharray: 0 100;
+        }
+        to {
+            stroke-dasharray: 100 100;
+        }
+    }
+    article {
+        padding: 12px;
+        margin: 0 auto;
+        width: 80%;
+        background: rgba(120, 0, 0, 0.2);
+    }
+  </style>
+
+</head>
+<body>
+  <div id="header">
+    <button id="logobtn">
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none" x="0px" y="0px" width="620px" height="130px" viewBox="0 0 620 130" id="logoimg" onclick="logoanim()">
+    <path id="logopath"  stroke="#ffffff" stroke-width="8" stroke-linejoin="miter" stroke-linecap="square" stroke-miterlimit="3" fill="none" d="M 553.4 46.3
+    Q 557.35 46.5 560.75 48.8 562.5 49.95 563.7 51.7 565.55 54.45 566.45 57.55 567.45 61.05 567.75 64.6 568 67.95 567.85 71.45 567.7 75.15 566.8 78.65 566 81.85 564.45 84.75 562.9 87.65 560.2 89.3 557.05 91.2 553.25 91.2 549.75 91.1 546.75 89.2 543.55 87.2 541.75 83.85 540.75 81.85 540.15 79.95 539.2 76.55 538.95 73.05 538.7 69.85 538.8 66.65 538.95 62.95 539.75 59.25 540.55 55.75 542.35 52.75 543.9 49.95 546.65 48.25 549.8 46.4 553.4 46.3 Z
+    M 457.4 90.25
+    L 432.35 90.25 432.35 67.6 432.35 47.2 457.4 47.2
+    M 432.35 67.6
+    L 453.3 67.6
+    M 346.75 84.15
+    Q 345.3 86.3 343.35 87.85 341.5 89.3 339.45 90.2 335.9 91.5 332.1 91 328.25 90.6 325.25 88.3 323.15 86.7 321.85 84.4 319.9 80.95 319.1 77.15 318.5 74.15 318.25 70.95 318.1 69.1 318.25 67.15 318.4 64.95 318.7 62.65 319.2 59 320.65 55.65 322.15 52.15 324.8 49.75 327.55 47.3 331.15 46.6 335.1 45.85 338.8 47.3 339.65 47.7 340.5 48.15 341.5 48.7 342.5 49.6 344.15 51.15 345.45 53.15
+    M 374.75 90.25
+    L 374.75 67.6 374.75 47.2
+    M 401.2 47.2
+    L 401.2 67.6 401.2 90.25
+    M 374.75 67.6
+    L 401.2 67.6
+    M 513.8 90.25
+    L 485.55 90.25 511.3 47.2 485.25 47.2
+    M 261.7 90.25
+    L 263.45 47.2 267.6 47.2 277.85 73.1 288.05 47.2 292.25 47.2 294 90.25
+    M 167.65 46.3
+    Q 171.75 46.5 175.05 48.8 176.75 49.95 177.95 51.75 179.8 54.45 180.75 57.55 181.2 59.2 181.5 60.85 182 63.8 182.1 66.7 182.3 70.3 181.9 74.05 181.55 78.1 180 81.7 179.4 83.25 178.65 84.7 177.1 87.65 174.45 89.3 171.35 91.2 167.5 91.2 163.95 91.1 161 89.2 157.85 87.2 156.05 83.85 154.35 80.5 153.75 76.75 153.1 72.85 153.05 68.8 153.05 65.8 153.45 62.75 153.85 59.45 155 56.25 156.25 52.85 158.7 50.15 161 47.65 164.2 46.8 166 46.25 167.65 46.3 Z
+    M 105.1 47.2
+    L 112.45 47.2 119.9 47.2
+    M 119.9 90.25
+    L 112.45 90.25 105.1 90.25
+    M 112.45 47.2
+    L 112.45 90.25
+    M 52 82.85
+    Q 53.3 86.3 55.85 88.85 58.65 91.55 62.55 91.7 64.45 91.85 66.35 91.6 70.05 91.2 72.7 88.5 75.6 85.55 75.45 81.25 75.4 79.95 75.15 78.65 74.8 76.75 73.4 75.15 71.55 73.05 68.95 71.85 66.65 70.8 64.25 69.75 60.95 68.35 57.75 66.95 53.95 65.3 52.7 61.3 52.4 60.2 52.25 59.15 51.95 57.1 52.5 55.25 53.6 51.8 56.6 49.9 59.9 48 63.8 48 67.8 48 71.05 50.15 72 50.8 72.85 51.75 74.5 53.65 75.35 55.85"/>
+    </svg>
+    </button>
+    <p>kwa umakini</p>
+</div>
+
+<article>
+  --  xx xx xx --
+</article>
+    
+
+
+
+<script type="text/javascript">
+    document.getElementById('logobtn').style.visibility = 'visible';
+    var animating = false;
+
+      // animate logo
+      function logoanim() {
+        if (animating) {
+            return
+        }
+    
+        document.getElementById('logobtn').classList = 'anim';
+        animating = true;
+        var path = document.querySelector('#logopath');
+        var length = path.getTotalLength();
+        path.style.transition = path.style.WebkitTransition = 'none';
+        // 
+        path.style.stroke = '#ffffff'
+        path.style.strokeDasharray = length + ' ' + length;
+        path.style.strokeDashoffset = -length;
+        path.getBoundingClientRect();
+        path.style.transition = path.style.WebkitTransition = 'stroke-dashoffset 2s ease-in-out';
+        path.style.strokeDashoffset = '0';
+        setTimeout(function() {
+          document.getElementById('logobtn').classList = '';
+          animating = false;
+        }, 300);
+      }
+</script>
+
+</body></html>
