@@ -19,40 +19,36 @@ body{
 
 #btns{
   position: absolute;
-  z-index: 99;
-  bottom: 20px;
+  z-index: 999;
+  top: 20px;
   font-size: 1.2em;
   line-height: 1.5em;
   z-index: 99;
   width: 100%;
   text-align: center;
-
 }
-.btn{
-  padding: 15px;
+#btns a {
+  cursor: pointer;
+  padding: 10px;
   font-family: monospace;
   cursor: pointer;
   color: #00ff00;
   text-transform: uppercase;
   font-size: 1em;
-  padding: 1em;
-  display: none;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  line-height: 1em;
+  border-radius: 50%;
 }
-.btn:hover {color: #fff;}
-#hud {position: fixed; top: 0; padding: 12px;}
-#bumpcanvas {transform: scale(0.5); position: absolute; top: 64px; left: -128px; display: block; width: 512px; height: 256px;}
-#colcanvas {transform: scale(0.5); position: absolute; top: -64px; left: -128px; display: block; width: 512px; height: 256px;}
-#theater {padding: 12px; position: absolute; top:0;}
-
-.vertical-center {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  right: 0;
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
+#btns a.active {
+  background: #000;
 }
-#frames {transform: rotate(90deg); z-index: 99;}
+#btns a:hover, #btns a.active {color: #fff;}
+.nipple {transform: scale(0.5);}
+.nipple div.front {cursor: move;}
+.nipple:hover, .nipple .front:hover {opacity: 1;}
+.nipple div.back {visibility: hidden;}
   </style>
 </head>
 <body>
@@ -60,10 +56,9 @@ body{
 <div id="joy"></div>
 
 <div id="btns">
-    <a class="btn" id="idle">idle<a>
-    <a class="btn" id="walk">walk</a>
-    <a class="btn" id="run">run</a>
-    <a class="btn" id="sprint">sprint</a>
+    <a id="walk" class="active">2</a>
+    <a id="run">3</a>
+    <a id="sprint">4</a>
 </div>
 
 <script src="js/nipplejs.min.js"></script>   
@@ -75,6 +70,8 @@ body{
 
 
 <script>
+
+var runstates = 1;
 
 // globals
 const HERO = {
@@ -109,81 +106,55 @@ function speedLimit(vx, vy, speedLimit) {
 }
 
 var walking = false;
-var running = false;
+var paused = false;
 
 // nipple
 const nipple = nipplejs.create({
-  // dataOnly:true,
-  // zone: document.body,
-  // zone: joystickDiv,
   mode: 'static',
   zone: document.getElementById('joy'),
   position: {
     left: '50%',
-    bottom: '10%'
+    bottom: '18%'
   },
-  follow:false,
-  dynamicPage: false,
-});
+  follow:true,
+  shape: 'circle',
+  dynamicPage : true,
+  // size:'0.5',
+  restOpacity:1,  
+  threshold : 0.5
+  });
 
 nipple.on("move", (e, data) => {
       HERO.force = Math.floor(data.distance);
 
   if (HERO.force>20) {
-      const vx = data.force * Math.cos(data.angle.radian);
+    const vx = data.force * Math.cos(data.angle.radian);
     const vy = -data.force * Math.sin(data.angle.radian);
     const v = speedLimit(vx, vy, HERO.maxSpeed);
     HERO.vx = v.vx;
     HERO.vy = v.vy;
     HERO.rotation = Math.atan2(HERO.vy, HERO.vx) + Math.PI * 0.5;
-    console.log(HERO.force)
 
-      if (walking || running) {return false}
-      HERO.speed = 100;
-      playAction(3);
-      walking = true;
-      running = false
+    //
+    if (walking) {return false}
+    HERO.speed = runstates*200;
+    playAction(runstates);
+    walking = true;
   }
-  // if (HERO.force>20)  {      
-  // if (running) {return false}
-  //     playAction(2);
-  //     running = true;
-  //     walking = false;
-  //  }
-
-
-  // if (data.force>2) {
-  //     playAction(3)
-  // }
 });
 
 // end
 nipple.on("end", (e, data) => {
   playAction(0);
   walking = false;
-  running = false;
 });
 
 
-// set speed
-// sprint.addEventListener("click", (event) => {setxvar(3)});
-// run.addEventListener("click", (event) => {setxvar(1.8)});
-// idle.addEventListener("click", (event) => {setxvar(0)});
-// walk.addEventListener("click", (event) => {setxvar(0.8)});
-
-
-// function setxvar(argument) {
-//     setTimeout(function () {
-//       xval=argument/3;
-//     }, 60)
-// }
-
 // globals
-var scene, clock, camera, renderer, clock, mixer, actions, spine;
+var scene, clock, camera, renderer, clock, mixer, actions;
 var anims = [];
 var parts = [];
 var speed = 0;
-// var index = 0;
 var anim = null;
 var xval = 0.8/3;
 var lerpspeed = 0;
@@ -248,18 +219,16 @@ function init(){
   
 
   // button actions
-  // const btns = document.getElementById("btns");
-  // btns.childNodes.forEach( btn => {
-  //   if (btn.innerHTML !== undefined && btn.innerHTML.trim().length != 0){
-  //     anims.push(btn.innerHTML)
-  //   }
-  // }); // foreach
+  const btns = document.getElementById("btns");
+  btns.childNodes.forEach( btn => {
+    if (btn.innerHTML !== undefined && btn.innerHTML.trim().length != 0){
+      btn.addEventListener('click', 
+        xvar,        
+      );
+    }
+  }); // foreach
 
-      anims.push('idle')
-      anims.push('walk')
-      anims.push('run')
-      anims.push('sprint')
-
+   
   // loader
   const loader = new THREE.FBXLoader();
 
@@ -268,8 +237,6 @@ function init(){
     actions = [];
     const action = mixer.clipAction(object.animations[0]);
     action.play();
-
-
     object.traverse( child => {
       if (child.isMesh){
         child.material.map = new THREE.TextureLoader().load( '3d/handala.png' );
@@ -284,11 +251,15 @@ function init(){
 
     
     herogroup.add(object);
+    anims.push('idle')
+    anims.push('walk')
+    anims.push('run')
+    anims.push('sprint')
+    loadAnimation(loader);            
+  });
+ 
 
-    loadAnimation(loader);      
-      
-
-    // floor texture
+     // floor texture
     var geometry =  new THREE.CircleBufferGeometry( 5, 30 );
     window.groundtex = new THREE.TextureLoader().load( '3d/tex.png' );
     groundtex.magFilter = THREE.NearestFilter;
@@ -306,8 +277,7 @@ function init(){
     ground.rotation.set (-Math.PI/2,0,0);
     scene.add( ground );
 
-  });
-  
+ 
     // floor
     const mesh = new THREE.Mesh( new THREE.CircleBufferGeometry( 5, 60 ), new THREE.MeshLambertMaterial( { 
       color: 0x330000, 
@@ -324,6 +294,18 @@ function init(){
     }, 500)
 } // end init
 
+
+function xvar(arg){
+  // console.log(this.innerHTML-1)
+  runstates = this.innerHTML-1;
+  btns.childNodes.forEach( btn => {
+    btn.classList = '';
+  }); // foreach
+  this.classList = 'active';
+
+
+
+}
 
 
 function playAction(index){
@@ -354,8 +336,8 @@ function loadAnimation(loader){
 
 // loop
 function update(){
-  // if (paused) {return}
-  // controls.autoRotate.update();
+  if (paused) {return}
+
   // RAF
   requestAnimationFrame( update );
   renderer.render( scene, camera );
@@ -364,22 +346,9 @@ function update(){
   if (mixer) {
     const dt = clock.getDelta();
     mixer.update(dt);
-    // if (xval>0.1 && typeof groundtex !== 'undefined') {
-    //   lerpspeed += (xval-lerpspeed)*0.3;
-    //   groundtex.offset.y -= lerpspeed/150; 
-    //   cameragroup.rotation.y += 0.004;     
-    // }
-    if (walking || running) {
-      // groundtex.offset.x = (HERO.x -= HERO.vx)/600; 
-      // groundtex.offset.y = ((HERO.y += HERO.vy)/600);
-      if (walking){
-        groundtex.offset.x -= (HERO.vx)/HERO.speed; 
-        groundtex.offset.y += (HERO.vy)/HERO.speed; 
-      }
-      // if (running){
-      //   groundtex.offset.x -= (HERO.vx)/300; 
-      //   groundtex.offset.y += (HERO.vy)/300; 
-      // }
+    if (walking) {
+        groundtex.offset.x -= (HERO.vx/600)*runstates; 
+        groundtex.offset.y += (HERO.vy/600)*runstates; 
       // lerp rotation
       HERO.quaternion = new THREE.Quaternion(); 
       HERO.quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), -HERO.rotation );
@@ -409,9 +378,9 @@ document.addEventListener("visibilitychange", function() {
   document.title = document.hidden ? "bye" : "hi";
 
   if (document.visibilityState === 'visible') {
-    pause = false;
+    paused = true;
   } else {
-    pause = true;
+    paused = false;
   }
 
 });
