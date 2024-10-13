@@ -1,9 +1,6 @@
 <!-- to do -  
-. when user adds row, add all the cells too
-. remove add cells button
-. remove button to remove selected rows
 . move list table items
-
+. fix clear table function
 -->
 <!DOCTYPE html>
 <html>
@@ -12,223 +9,307 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title></title>
 	<style type="text/css">
-@font-face {
-  font-family: 'jetbrainsmono-regular-webfont';
-  src: url('font/jetbrainsmono-regular-webfont.woff') format('woff'),
-  url('font/jetbrainsmono-regular-webfont.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-}
-
-body, button, input {
+    @font-face {
       font-family: 'jetbrainsmono-regular-webfont';
-}
+      src: url('font/jetbrainsmono-regular-webfont.woff') format('woff'),
+      url('font/jetbrainsmono-regular-webfont.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
 
+    body, button, input {
+      font-family: 'jetbrainsmono-regular-webfont';
+    }
 
-body {
-  background-color: #211e20;
-  color: #e9efec;
-}
+    body {
+    margin: 0;
+    padding: 0;
+    background-color: #211e20;
+    color: #e9efec;
+    }
 
-button {
-    background-color: transparent;
-    border: none;
-    color: #a0a08b;
-    padding: 12px;
-    cursor: pointer;
-}
-button:hover {
-    background-color: #111;
-}
-li {
+    li {
     list-style: none;
     color: #a0a08b;
-}
-input {
+    }
+    input {
     border: none;
-    width: 80px;
     font-size: 14px;
-    padding: 2px;
     background-color: transparent;
-    border: none;
     padding: 16px;
     color: #e9efec;
     width: 100%;
-}
+    }
 
-input:hover {
+    input:hover {
     background-color: #0000;
     color:  #a0a08b;
-}
+    }
 
-input:focus {
+    input:focus {
     background-color: rgba(255, 100, 255, 0.1);
     border: none;
     outline: none;
     display: block;
-}
+    }
 
-input:not(:focus) {
-/*    text-align: right;*/
-}
+    input:not(:focus) {
+    }
 
-table {
+    table {
     border-collapse: collapse;  
     width: 100%;
-}
+    }
 
-td {
+    td {
     border: 1px solid #000;
     padding: 0;
-}
+    }
 
-table tr td:nth-child(1) { 
-  padding-right: 6px;
-  user-select: none;
-}
+    table tr td:nth-child(1) { 
+        padding-right: 6px;
+        user-select: none;
+    }
 
-table tr:nth-child(1) {
-    user-select: none;
-    padding-bottom: 18px;
-    height: 30px;
-}
+    table tr:nth-child(1) {
+        user-select: none;
+        padding-bottom: 18px;
+        height: 30px;
+    }
 
-table tr:nth-child(1) {
- color:#9e9e84;
-}
+    table tr:nth-child(1) {
+        color:#9e9e84;
+        cursor: pointer;
+    }
 
-table tr:first-child td:first-child { 
-    text-indent: -1000em;
-}
+    table tr td:hover {
+        background-color: rgba(0,0,0,0.1);
+    }
 
-tr:first-child td, td:first-child {
-    padding: 1px 3px;
-    font-weight: bold;
-    text-align: center;
-    border: none;
-}
+    table tr:first-child td:first-child { 
+        text-indent: -1000em;
+    }
 
-th, td {
-  text-align: left;
-}
+    tr:first-child td, td:first-child {
+        padding: 1px 3px;
+        font-weight: bold;
+        text-align: center;
+        border: none;
+/*        background-color: rgba(0,0,0,0.1);*/
+    }
 
-td {
-    overflow: hidden ;
-}
-footer {
-    font-size: 80%;
-}
+    th, td {
+      text-align: left;
+    }
 
-#hud button {
-    border-top:  #a0a08b 1px dotted;
-}
+    td {
+        overflow: hidden ;
+    }
+    footer {
+        font-size: 80%;
+    }
 
-#hud {
+    #hud {
+        display: block;
+        height: 50px;
+        line-height: 50px;
+        padding-bottom: 2px;
+        margin: 0;
+        width: 100%;    
+    }
 
-    padding-top: 0;
-    margin-bottom: 12px;
-}
 
-	</style>
+    button {
+        background-color: transparent;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    #hud button {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        margin:0;
+        padding: 0;
+    }
+    #hud button:hover {
+        background-color: #000;
+    }
+
+
+    #btndelrow {
+        transform: rotate(90deg);
+    }
+    #btnaddrow {
+        transform: rotate(-90deg);
+    }    
+    #xvar {
+        position: absolute;
+        top: 0px;
+        right: 10px;
+    }
+</style>
 </head>
 <body>
 
-<div id="hud">
-<button id="btnaddrow" onclick="addrow()">addrow</button>
-<!-- <button id="btnaddcell" onclick="addcell()">addcell</button> -->
-</div>
+    <div id="hud">
+        <button id="btndelrow" onclick="deleteRow()" title="delete row">&lt;</button>
+        <button id="btnaddrow" onclick="addrow()" title="add row">&lt;</button>
+        <button id="btndelcol" onclick="deleteColumn()" title="delete column">&lt;</button>
+        <button type="button" id="btnaddcol" onclick="addColumn()" title="add column">&gt;</button>
+        <button id="btnclr" onclick="empty()" title="clear all">x</button>
 
-<table></table>
-   
-   <script type="text/javascript">
+        <span id="xvar"></span>
+    </div>
 
-    var num = 6;
+    <table id="tbl"></table>
+
+    <script type="text/javascript">
+
+    // vars
+        var tbl = document.querySelector('#tbl');
+    var cols = 3; // verticals [A-Z]
+    var rows = 3; // horizontals [1-999]
     var thisrow = 0;
     var thiscell = 0;
     var thiscolunm = 0;
 
-	// add row
-   	function addrow(argument) {
-        row = document.querySelector("table").insertRow(-1);
-        row.insertCell(-1).innerHTML = num++;
-        thisrow=num;
-        for (var j=0; j<num-2; j++) {
-            // var letter = String.fromCharCode("A".charCodeAt(0)+j-1);
-            // row.insertCell(-1).innerHTML = "<input id='de'/>";
-            row.insertCell(-1).innerHTML = "<input id='"+ letter+j +"'/>";
-            // thisrow = j;
+    // make table to set size 
+    for (var i=0; i<(rows+1); i++) {
+        var row = document.querySelector("table").insertRow(-1);
+        for (var j=0; j<(cols+1); j++) {
+            var letter = String.fromCharCode("A".charCodeAt(0)+j-1);
+            row.insertCell(-1).innerHTML = i&&j ? "<input id='"+ letter+i +"'/>" : i||letter;
+            thisrow = j;
         }
-   	}
-
-
-// 
-   	for (var i=0; i<num; i++) {
-    var row = document.querySelector("table").insertRow(-1);
-    for (var j=0; j<num; j++) {
-        var letter = String.fromCharCode("A".charCodeAt(0)+j-1);
-        row.insertCell(-1).innerHTML = i&&j ? "<input id='"+ letter+i +"'/>" : i||letter;
-        thisrow = j;
     }
-}
 
-// show data
-var DATA={}, 
-INPUTS=[].slice.call(document.querySelectorAll("input"));
+    // show data
+    var DATA={}, 
+    INPUTS=[].slice.call(document.querySelectorAll("input"));
 
-// make data grid
-INPUTS.forEach(function(elm) {
-    elm.onfocus = function(e) {
-        e.target.value = localStorage[e.target.id] || "";
-    };
-    elm.onblur = function(e) {
-        localStorage[e.target.id] = e.target.value;
-        computeAll();
-    };
-    var getter = function() {
-        var value = localStorage[elm.id] || "";
-        if (value.charAt(0) == "=") { 
-            with (DATA) return eval(value.substring(1));
-        } else { return isNaN(parseFloat(value)) ? value : parseFloat(value); }
-    };
-    Object.defineProperty(DATA, elm.id, {get:getter});
-    Object.defineProperty(DATA, elm.id.toLowerCase(), {get:getter});
-});
-
+    // make data grid
+    INPUTS.forEach(function(elm) {
+        elm.onfocus = function(e) {
+            e.target.value = localStorage[e.target.id] || "";
+        };
+        elm.onblur = function(e) {
+            localStorage[e.target.id] = e.target.value;
+            computeAll();
+        };
+        var getter = function() {
+            var value = localStorage[elm.id] || "";
+            if (value.charAt(0) == "=") { 
+                with (DATA) return eval(value.substring(1));
+            } else { return isNaN(parseFloat(value)) ? value : parseFloat(value); }
+        };
+        Object.defineProperty(DATA, elm.id, {get:getter});
+        Object.defineProperty(DATA, elm.id.toLowerCase(), {get:getter});
+    });
 
 
-// start
-(window.computeAll = function() {
-    INPUTS.forEach(function(elm) { try { elm.value = DATA[elm.id]; } catch(e) {} });
-        // console.log(localStorage[elm.id])
-})();
+    // on click
+    document.querySelector("table").addEventListener('click', function(e) {
+        // id of input
+        if (e.target.tagName === 'INPUT'){
+          thisrow = e.target.id.slice(1);
+          thiscell = e.target.id.slice(0, -1); 
+          xvar.innerHTML = thiscell +''+ thisrow;
+      }
+        // TD
+      if (e.target.tagName === 'TD') {
 
-
-// get id of input on click
-document.querySelector("table").addEventListener('click', function(e) {
-    if (e.target.tagName === 'INPUT'){
-      thisrow = e.target.id.slice(1);
-      thiscell = e.target.id.slice(0, -1); 
-      console.log(e.target.id, thiscell, thisrow );
-
-    }
-});
-
-
-// // add rows
-// buttons.forEach((element) =>
-//   element.addEventListener("click", function () {
-//     this.parentElement.parentElement.remove();
-//   })
-// );
-
-document.querySelector("table").addEventListener('click', (e) => {
-    if (e.target.nodeName === 'BUTTON' && e.target.name === 'remove') {
-      e.target.closest('tr').remove();
-    }
+          xvar.innerHTML = e.target.textContent;
+          // console.log(alphaVal(e.target.textContent))
+          thiscolunm = e.target.innerHTML.toLowerCase().charCodeAt(0) - 97 + 1;
+          xvar.innerHTML += thiscolunm;
+      }
   });
 
 
 
-   </script>
+    // add columns
+    function addColumn() {
+        cols++;
+        i;
+        // open loop for each row and append cell
+        for (i = 0; i < tbl.rows.length; i++) {
+            createCell(tbl.rows[i].insertCell(tbl.rows[i].cells.length), i);
+        }
+        xvar.innerHTML = cols+' cols'
+    }
+
+    // create column cell
+    function createCell(cell, text) {
+        var input = document.createElement('input');
+        input.setAttribute('type', 'text')
+        cell.appendChild(input);
+        var letter = String.fromCharCode("A".charCodeAt(0)+cols-1);
+        input.id = letter+text;
+        if (text<1) {
+            cell.innerHTML = letter;
+        }
+    }
+
+
+    // add rows
+    function addrow() {
+        rows=rows+1;
+        row = document.querySelector("table").insertRow(-1);   
+        row.insertCell(-1).innerHTML = rows;
+        for (var j=0; j<cols; j++) {
+            var letter = String.fromCharCode("A".charCodeAt(0)+j);
+            row.insertCell(-1).innerHTML = "<input id='"+ letter+rows +"'/>";
+        }
+        xvar.innerHTML = rows+' rows';
+        computeAll();
+    }
+
+    // delete column
+    function deleteColumn() {
+        if (cols==1) {return}
+            cols=cols-1;
+        var allRows = tbl.rows;
+        for (var i=0; i< allRows.length; i++) {
+            allRows[i].deleteCell(-1); 
+        }
+        xvar.innerHTML = cols+' cols';
+        computeAll();
+    }
+
+    // delete row
+    function deleteRow(argument) {
+        if (rows==1) {return}
+            rows=rows-1;
+        var rowCount = tbl.rows.length;
+        tbl.deleteRow(rowCount -1);
+        xvar.innerHTML = rows+' rows';
+        computeAll();
+    }
+
+
+    // clear table
+    function empty() {
+        for (var i=0; i< tbl.rows.length+1; i++) {
+            deleteRow();
+        }
+        for (var i=0; i< tbl.rows[0].cells.length+1; i++) {
+            deleteColumn();
+        }
+
+        // clear cell
+        document.querySelector('#A1').innerHTML = "";
+        document.querySelector('#A1').value = "";
+        localStorage.clear();
+    }
+
+
+    // start
+    (window.computeAll = function() {
+        INPUTS.forEach(function(elm) { try { elm.value = DATA[elm.id]; } catch(e) {} });
+    })();
+
+</script>
 </body>
 </html>
