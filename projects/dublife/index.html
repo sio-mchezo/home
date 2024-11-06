@@ -1,0 +1,327 @@
+<!-- peace -->
+<html>
+<head>
+	<title>dub life</title>
+	<meta name="viewport" 
+	content="width=device-width, initial-scale=1.0, user-scalable=0" />
+
+	<style>
+	html {background: #000;}
+	body { margin: 0; font-family: monospace; color: #fff; user-select:none; transition: all 0.2s ease;
+		background-size: cover;  }
+	#cl {position: absolute; z-index: 100; bottom: 0; left: 0; display: none;}
+	#timecode {position: absolute; top: 0; left:0; margin:1em; font-size:2em; 
+	}
+	#pbtn {position: absolute; top: 0; left: 0;
+		right:0; display: block;}
+	#playbtn {background: transparent; outline: none; border: none; cursor: pointer; transform: scale(0.8); display: block;
+			width: 100px; margin: 0 auto;
+		}
+	#playbtn.on .playicon {display: none;}
+	#playbtn.on .pauseicon {display: block;}
+	#playbtn.off .playicon {display: block;}
+	#playbtn.off .pauseicon {display: none;}
+		</style>
+	</head>
+	<body>
+		<div id="pbtn">
+<!-- 			<button id="playbtn" class="off">
+				<svg class="playicon" height="100" preserveAspectRatio="none" width="100" xmlns="http://www.w3.org/2000/svg"><path d="m19.55 14.85v70.3l60.95-35.15z" fill="#fff"/></svg>
+
+				<svg class="pauseicon" height="100" preserveAspectRatio="none" width="100" xmlns="http://www.w3.org/2000/svg"><path d="m33.05 39.05h-12v43h12zm22.5 0h-12v43h12z" transform="matrix(1.53488159 0 0 1.53488159 -11.25 -42.9)" fill="#fff"/></svg>
+			</button> -->
+			<button onclick="setstate(1)">state1</button>
+			<button onclick="setstate(2)">state2</button>
+			<button onclick="setstate(3)">state3</button>
+			<button onclick="setstate(4)">state4</button>
+		</div>
+
+
+		<script src="js/three.min.js"></script>
+		<script src="js/OrbitControls.js"></script>
+
+	<script>
+		var n = 0;
+		var fps = 4;
+		var headpivots = [];
+		var bodypivots = [];
+		var headnumber = 4; // rows <<<<<<<<<<<<<<<<<<<<
+		var state = 0;
+
+
+		// set state
+		function setstate(argument) {
+			state = argument;
+		}
+
+
+		// // global vars
+		var paused = false;
+		// var playbtn = document.getElementById('playbtn');
+		// playbtn.addEventListener("click", playpause, false );
+
+
+		// play/pause button function
+		function playpause() {
+		  var element = document.getElementById("playbtn");
+		  // element.classList.toggle("on");
+			if (element.classList == 'on') {
+				element.classList = 'off';
+				paused = false;
+			} else {
+				element.classList = 'on';
+				paused = true;
+			}
+		}
+
+
+
+		// three.js
+		var mouse = new THREE.Vector2();
+		var scene = new THREE.Scene();
+		var clock = new THREE.Clock();
+		var camera = new THREE.PerspectiveCamera( 55, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+		var renderer = new THREE.WebGLRenderer( { 
+			// alpha: true, 
+			// antialias: true
+			 } );
+		scene.background = new THREE.Color( 0x008807 );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.domElement.id = 'cnv';
+		document.body.appendChild( renderer.domElement );
+
+		// camera
+		// var controls = new THREE.OrbitControls( camera, renderer.domElement);
+		camera.position.z = 17;
+		camera.position.y = 0;
+
+		// Lights
+		var light = new THREE.AmbientLight( 0x666666 );
+		scene.add( light );
+		var light3 = new THREE.PointLight( 0xffefef, 0.5 );
+		light3.position.set( 20, 1, 30 );
+		scene.add( light3 );
+		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.2 );
+		directionalLight.position.set(0,-100,0)
+		directionalLight.rotation.set(-Math.PI/2,0,0)
+		scene.add( directionalLight );
+
+		// groups
+		txtgroup = new THREE.Group();
+		txtgroup.position.y = -20;
+		txtgroup.position.z = -30;
+		txtgroup.scale.set(2,2,2)
+		scene.add( txtgroup );
+
+		speakergroup = new THREE.Group();
+		speakergroup.scale.set(25,25,25)
+		speakergroup.position.set(-15.5,5,-14)
+		speakergroup.rotation.set(0,Math.PI/2,0)
+		txtgroup.add( speakergroup );
+
+		heads = new THREE.Group();
+		txtgroup.add( heads );
+
+		eqgroup = new THREE.Group();
+		txtgroup.add( eqgroup );
+
+		// head
+		facegroup = new THREE.Group();
+		txtgroup.add( facegroup );
+
+
+
+		// invisible cursor object
+		// var mouseGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+		// var mouseMaterial = new THREE.MeshBasicMaterial({
+		// 	color: 0x0000ff
+		// });
+		// mouseMesh = new THREE.Mesh(mouseGeometry, mouseMaterial);
+		// scene.add(mouseMesh);
+		// mouseMesh.visible = false;
+
+		// background screen
+		bgtexture = new THREE.TextureLoader().load( 'assets/bg.png' );  
+		bgtexture.magFilter = THREE.NearestFilter;
+		bgtexture.minFilter = THREE.NearestFilter;
+		var geometry = new THREE.PlaneBufferGeometry( 100, 50, 1 );
+		var material = new THREE.MeshBasicMaterial( {
+			map: bgtexture,
+			transparent:true,
+			opacity:1
+		} );
+		var screen = new THREE.Mesh( geometry, material );
+		screen.position.z = -7;
+		screen.position.y = 5.5;
+		facegroup.add( screen );
+
+
+		// npc
+		heads.position.x = -(headnumber*2);
+		heads.position.y = (headnumber*4);
+
+		for (var x = 0; x < headnumber; x++) {
+			for (var y = 0; y < 3; y++) {
+				createhead(x*5,y*5,-y*3)			
+			}
+		}
+
+		// createhead(0,0,0);
+		
+		//
+		function createhead(x,y,z) {
+			var rnd = (Math.random()/3)+0.7;
+
+			// parent group
+			npc = new THREE.Group();
+			npc.position.set(x+(rnd*7)-8,y+(rnd*7)-14,z+(rnd));
+			npc.scale.set(rnd,rnd,rnd);
+			npc.random = rnd;
+			heads.add( npc );
+			bodypivots.push(npc)
+
+			// head
+  	        xsprite = new THREE.TextureLoader().load( 'assets/headanim.png' );
+  	        xbody = new THREE.TextureLoader().load( 'assets/body.png' );
+
+  	        //
+			const hdgeometry = new THREE.PlaneGeometry( 4, 4, 1 ); 
+			const head = new THREE.Mesh( hdgeometry, new THREE.MeshLambertMaterial( { map: xsprite }));
+			head.rotation.z = Math.random()-0.7;
+
+			// head.scale.y = ((Math.random()-0.5)/4)+0.98;
+			npc.add( head );
+			headpivots.push(head)
+
+			// hair
+			const hair = new THREE.Mesh( hdgeometry, new THREE.MeshLambertMaterial( { map: new THREE.TextureLoader().load( 'assets/hair.png' ),
+			transparent:true, alphaTest:0.5 }));
+			hair.position.z = -0.02;
+			head.add( hair );
+
+//
+			if (Math.random()>0.5) {
+				// head.rotation.y = Math.PI;
+				// hair.position.z = 0.2;
+				head.scale.x = -1;
+			}
+
+
+			// body
+			const bodygeo = new THREE.PlaneGeometry( 4, 8, 1 ); 
+			const bodyobj = new THREE.Mesh( bodygeo, new THREE.MeshLambertMaterial( {
+				map: xbody
+			} )); 
+			bodyobj.position.set(0,-4.6,-0.02)
+			bodyobj.rotation.z = (Math.random()-0.5)/8;
+			npc.add( bodyobj );
+			// bodyobj.scale.y = head.scale.y;
+
+			//
+			setmaterial(bodyobj, 2)
+			setmaterial(head, 6)
+			//
+	    // transparent shadows
+	      // bodyobj.customDepthMaterial = new THREE.MeshDepthMaterial({
+	      //   map: xbody,
+	      //   depthPacking: THREE.RGBADepthPacking,
+	      //   alphaTest: 0.1
+	      // })
+
+		}
+
+
+
+
+
+function setmaterial(argument, num) {
+	argument.material.map.magFilter = THREE.NearestFilter;
+	argument.material.map.minFilter = THREE.NearestFilter;
+	argument.material.alphaTest = 0.1;
+    argument.material.side =  THREE.DoubleSide;
+    argument.material.map.repeat.x = 1 / num;
+    //
+    argument.frames = 1/num;
+    argument.random = Math.random();
+}
+
+		// resize
+		window.addEventListener('resize', onWindowResize, false);
+
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}
+
+
+		// render loop
+		var animate = function () {
+		n++;
+    	var t = clock.getElapsedTime();
+
+		// animate npc
+		for (var i = 0; i < headpivots.length; i++) {
+  
+			// states
+			if (state===1) {
+					headpivots[i].rotation.z += Math.cos(n/30)/100; 	
+					headpivots[i].position.y += Math.cos(n/10)/30;					
+					bodypivots[i].rotation.z = Math.cos(n/20)/40;
+			}// if1
+
+	
+			if (state===2) {
+				headpivots[i].rotation.z += (0-headpivots[i].rotation.z)*0.2; ;
+				headpivots[i].position.y = (headpivots[i].position.y+Math.sin(n/10)/40);
+				bodypivots[i].rotation.z = Math.cos(n/20)/40;
+				bodypivots[i].position.x += Math.cos(n/(headpivots[i].random*30)+headnumber)/50;
+			} // if 2
+
+
+
+			if (state===3) {
+				headpivots[i].rotation.z += Math.sin(n/30)/100; 
+				headpivots[i].position.x = Math.cos(n/10)/4;
+				bodypivots[i].position.y += (Math.sin(n/10)/30);
+				bodypivots[i].scale.y += (Math.sin(n/10)/200);
+
+			} // if3
+		
+			if (state===4) {
+				headpivots[i].material.map.offset.x = (1/6)*5;
+				headpivots[i].rotation.z += (0-headpivots[i].rotation.z)*0.2;
+
+			} else {
+			// animate sprites
+        	headpivots[i].material.map.offset.x = Math.floor( ( t * ((headpivots[i].random/12)+fps) ) % (1/headpivots[i].frames) ) * 1 / (1/headpivots[i].frames);
+
+			headpivots[i].material.map.needsUpdate = true;
+			}
+
+		}// for
+
+
+
+		
+
+		
+
+			requestAnimationFrame( animate );
+			renderer.render( scene, camera );
+		
+
+		}; // end render loop
+
+
+		// start
+	setTimeout(function () {
+		animate();	   
+	}, 500)
+
+
+
+</script>
+</body>
+</html>	
