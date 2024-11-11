@@ -1,0 +1,431 @@
+<!-- to do -  
+. add settings:
+1. make headers into input fields (not ABC123 etc)
+2. themes / fonts
+3. export to json file
+4. save
+5. totals (like =sum(ABC) from excel)
+// check this for use instead of eval
+https://formulajs.info/
+-->
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+    @font-face {
+      font-family: 'jetbrainsmono-regular-webfont';
+      src: url('font/jetbrainsmono-regular-webfont.woff') format('woff'),
+      url('font/jetbrainsmono-regular-webfont.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body, button, input {
+      font-family: 'jetbrainsmono-regular-webfont';
+    }
+
+    body {
+    margin: 0;
+    padding: 0;
+    background-color: #211e20;
+    color: #e9efec;
+    overflow: hidden;
+    }
+
+    li {
+    list-style: none;
+    color: #a0a08b;
+    }
+    input {
+    border: none;
+    font-size: 14px;
+    background-color: transparent;
+    padding: 16px;
+    color: #e9efec;
+    width: 100%;
+    }
+
+    input:hover {
+    background-color: #0000;
+    color:  #a0a08b;
+    }
+
+    input:focus {
+    background-color: rgba(255, 100, 255, 0.1);
+    border: none;
+    outline: none;
+    display: block;
+    }
+
+    input:not(:focus) {
+    }
+
+    table {
+    border-collapse: collapse;  
+    width: 100%;
+    }
+
+    td {
+    border: 1px solid #333;
+    padding: 0;
+    }
+
+    table tr td:nth-child(1) { 
+        padding-right: 6px;
+        user-select: none;
+    }
+
+    table tr:nth-child(1) {
+        user-select: none;
+        padding-bottom: 18px;
+        height: 30px;
+    }
+
+    table tr:nth-child(1) {
+        color:#9e9e84;
+        cursor: pointer;
+    }
+
+    table tr td:hover {
+        background-color: rgba(0,0,0,0.1);
+    }
+
+    table tr:first-child td:first-child { 
+        text-indent: -1000em;
+    }
+
+    tr:first-child td, td:first-child {
+        padding: 1px 3px;
+        font-weight: bold;
+        text-align: center;
+        border: none;
+    }
+
+    th, td {
+      text-align: left;
+    }
+
+    td {
+        overflow: hidden ;
+    }
+    footer {
+        font-size: 80%;
+    }
+
+    #hud {
+        display: block;
+        height: 50px;
+        line-height: 50px;
+        padding-bottom: 2px;
+        margin: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.2);    
+    }
+
+
+    button {
+        background-color: transparent;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    #hud button {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        margin:0;
+        padding: 0;
+
+    }
+    #hud button:hover {
+        background-color: #000;
+    }
+    #hud button svg {   
+        display: block;
+        width: 40px;
+        height: 40px;
+        padding: 5px;
+    }
+
+    #btndelrow, #savebtn {
+        transform: rotate(90deg);
+    }
+    #btnaddrow {
+        transform: rotate(-90deg);
+    }    
+    #xvar {
+        position: absolute;
+        top: 0px;
+        right: 10px;
+    }
+    #settings {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 10;
+        margin: 5px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        font-size: 2em;
+        }
+   #settings svg {
+        display: block;
+        width: 40px;
+        height: 40px;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    #settings:active {
+        transform: rotate(45deg);
+    }
+    #overlay {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 150px;
+        background-color: red;
+        z-index: 9;
+        transform: translateY(150px);
+        transition: all 0.1s ease-in-out;
+    }
+    #overlay.active {
+        transform: translateY(0);        
+    }
+
+</style>
+</head>
+<body>
+
+    <!-- <button id="settings" onclick="options()">+</button><div id="overlay"></div> -->
+
+
+    <div id="hud">
+        <button id="btndelrow" onclick="deleteRow()" title="delete row">&lt;</button>
+        <button id="btnaddrow" onclick="addrow()" title="add row">&lt;</button>
+        <button id="btndelcol" onclick="deleteColumn()" title="delete column">&lt;</button>
+        <button type="button" id="btnaddcol" onclick="addColumn()" title="add column">&gt;</button>
+        <button id="btnclr" onclick="empty()" title="clear all">x</button>
+
+        <button type="button" id="savebtn" onclick="
+        // tableToJson(tbl)
+       export2txt(localStorage)    
+        " title="save">>|</button>
+
+        <span id="xvar"></span>
+    </div>
+
+    <table id="tbl"></table>
+
+    <script type="text/javascript">
+
+function options() {
+  overlay.classList.toggle("active");
+} 
+
+
+    // vars
+    var tbl = document.querySelector('#tbl');
+    var cols = 3; // verticals [A-Z]
+    var rows = 3; // horizontals [1-999]
+    var thisrow = 0;
+    var thiscell = 0;
+    var thiscolunm = 0;
+
+    // make table to set size 
+    for (var i=0; i<(rows+1); i++) {
+        var row = document.querySelector("table").insertRow(-1);
+        for (var j=0; j<(cols+1); j++) {
+            var letter = String.fromCharCode("A".charCodeAt(0)+j-1);
+            row.insertCell(-1).innerHTML = i&&j ? "<input id='"+ letter+i +"'/>" : i||letter;
+            thisrow = j;
+        }
+    }
+
+    // show data
+    var DATA={}, 
+    INPUTS=[].slice.call(document.querySelectorAll("input"));
+
+    // make data grid and eval for equals signs
+    INPUTS.forEach(function(elm) {
+        elm.onfocus = function(e) {
+            e.target.value = localStorage[e.target.id] || "";
+        };
+        elm.onblur = function(e) {
+            localStorage[e.target.id] = e.target.value;
+            computeAll();
+        };
+        var getter = function() {
+            var value = localStorage[elm.id] || "";
+            if (value.charAt(0) == "=") { 
+                with (DATA) return eval(value.substring(1));
+            } else { return isNaN(parseFloat(value)) ? value : parseFloat(value); }
+        };
+        Object.defineProperty(DATA, elm.id, {get:getter});
+        Object.defineProperty(DATA, elm.id.toLowerCase(), {get:getter});
+    });
+
+
+    // on click
+    document.querySelector("table").addEventListener('click', function(e) {
+        // id of input
+        if (e.target.tagName === 'INPUT'){
+          thisrow = e.target.id.slice(1);
+          thiscell = e.target.id.slice(0, -1); 
+          xvar.innerHTML = thiscell +''+ thisrow;
+      }
+        // TD
+      if (e.target.tagName === 'TD') {
+
+          xvar.innerHTML = e.target.textContent;
+          // console.log(alphaVal(e.target.textContent))
+          thiscolunm = e.target.innerHTML.toLowerCase().charCodeAt(0) - 97 + 1;
+          xvar.innerHTML += thiscolunm;
+      }
+  });
+
+
+
+    // add columns
+    function addColumn() {
+        cols++;
+        i;
+        // open loop for each row and append cell
+        for (i = 0; i < tbl.rows.length; i++) {
+            createCell(tbl.rows[i].insertCell(tbl.rows[i].cells.length), i);
+        }
+        xvar.innerHTML = cols+' cols'
+    }
+
+    // create column cell
+    function createCell(cell, text) {
+        var input = document.createElement('input');
+        input.setAttribute('type', 'text')
+        cell.appendChild(input);
+        var letter = String.fromCharCode("A".charCodeAt(0)+cols-1);
+        input.id = letter+text;
+        if (text<1) {
+            cell.innerHTML = letter;
+        }
+    }
+
+
+    // add rows
+    function addrow() {
+        rows=rows+1;
+        row = document.querySelector("table").insertRow(-1);   
+        row.insertCell(-1).innerHTML = rows;
+        for (var j=0; j<cols; j++) {
+            var letter = String.fromCharCode("A".charCodeAt(0)+j);
+            row.insertCell(-1).innerHTML = "<input id='"+ letter+rows +"'/>";
+        }
+        xvar.innerHTML = rows+' rows';
+        computeAll();
+    }
+
+    // delete column
+    function deleteColumn() {
+        if (cols==1) {return}
+            cols=cols-1;
+        var allRows = tbl.rows;
+        for (var i=0; i< allRows.length; i++) {
+            allRows[i].deleteCell(-1); 
+        }
+        xvar.innerHTML = cols+' cols';
+        computeAll();
+    }
+
+    // delete row
+    function deleteRow(argument) {
+        if (rows==1) {return}
+        rows=rows-1;
+        var rowCount = tbl.rows.length;
+        tbl.deleteRow(rowCount -1);
+        xvar.innerHTML = rows+' rows';
+        computeAll();
+    }
+
+
+    // clear table
+    function empty() {
+        for (var i=0; i< tbl.rows.length+1; i++) {
+            deleteRow();
+        }
+        for (var i=0; i< tbl.rows[0].cells.length+1; i++) {
+            deleteColumn();
+        }
+
+        // clear cell
+        document.querySelector('#A1').innerHTML = "";
+        document.querySelector('#A1').value = "";
+        localStorage.clear();
+    }
+
+    // convert to json // working on this <<<<<<<<<<<<<<<
+    function tableToJson(table) { 
+        var data = [];
+        for (var i = 1; i < table.rows.length; i++) { 
+            var tableRow = table.rows[i]; 
+            var rowData = []; 
+            for (var j = 0; j < tableRow.cells.length; j++) { 
+                // console.log(tableRow.cells[j].children)
+                rowData.push(tableRow.cells[j].innerHTML);
+                
+                // get value from input
+                // console.log(tableRow.cells[j].children[0])
+                if (typeof tableRow.cells[j].children[0] != "undefined") {
+                    console.log(tableRow.cells[j].children[0].value)
+                } else {
+                    console.log('empty')
+                }
+
+            } 
+            data.push(rowData); 
+        } 
+        return data; 
+    }   
+
+
+    //
+    function export2txt(originalData) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(originalData, null, 2)], {
+        type: "text/plain"
+      }));
+      a.setAttribute("download", "data.txt");
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+}
+
+
+    // start
+    (window.computeAll = function() {
+        INPUTS.forEach(function(elm) { 
+            try { elm.value = DATA[elm.id]; } 
+            catch(e) {}
+        });    
+
+
+        // console.log(tableToJson(tbl));
+
+        // console.log(tableToObject(tbl));
+       // console.log(localStorage);    
+       // console.log(localStorage);
+    })();
+
+</script>
+</body>
+</html>
